@@ -4,7 +4,7 @@ from lightgbm import LGBMClassifier
 from xgboost.sklearn import XGBClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from backend.src.utils.utils import compute_scale_pos_weight
+from sklearn.calibration import CalibratedClassifierCV
 from backend.src.modeling.config import MODEL_CONFIG
 from backend.src.modeling.base_model import BaseModel
 
@@ -72,7 +72,7 @@ class ClassificationModel(BaseModel):
             Target variable (binary classification).
         """
         self.model.fit(X, y)
-
+        
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
         Generate class predictions for the input data.

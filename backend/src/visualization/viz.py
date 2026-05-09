@@ -378,7 +378,7 @@ class Visualization:
         y_true,
         predicted_pd,
         dataset_name="Test Set",
-        n_bins=10
+        n_bins=50
     ):
         """
         Plot calibration curve comparing predicted PD vs observed default rate.
