@@ -20,6 +20,7 @@
     />
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 </head>
 
@@ -134,6 +135,87 @@
         <div class="divider"></div>
     </selection>
 
+    
+    <!-- =========================
+         Model Results
+    ========================== -->
+<section class="charts-section">
+
+    <h1>
+        ML Model Performance
+    </h1>
+
+    <h2>
+        Train vs Test Metrics
+    </h2>
+
+    <!-- ROC -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>ROC Curve - Train</h2>
+            <div id="roc-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>ROC Curve - Test</h2>
+            <div id="roc-test"></div>
+        </div>
+
+    </div>
+
+
+    <!-- DENSITY -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>Probability Density - Train</h2>
+            <div id="density-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Probability Density - Test</h2>
+            <div id="density-test"></div>
+        </div>
+
+    </div>
+
+
+    <!-- CONFUSION -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>Confusion Matrix - Train</h2>
+            <div id="cm-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Confusion Matrix - Test</h2>
+            <div id="cm-test"></div>
+        </div>
+
+    </div>
+
+
+    <!-- CALIBRATION -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>Calibration Curve - Train</h2>
+            <div id="calibration-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Calibration Curve - Test</h2>
+            <div id="calibration-test"></div>
+        </div>
+
+    </div>
+
+</section>
+
+
+
 
     <!-- =========================
          FOOTER
@@ -144,21 +226,18 @@
         <div class="footer-right">
 
             <p>
-                Built with Python, XGBoost,
-                LightGBM, Flask & Leaflet.
+                Built by Mapachitas Team
             </p>
 
             <span>
-                © 2026 Jalisco Risk Analytics
+                © 2026 Mapachitas. All rights reserved.
             </span>
 
         </div>
 
     </footer>
 
-
     <script src="app.js"></script>
-
 
 
 </body>

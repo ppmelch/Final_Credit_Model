@@ -1,5 +1,5 @@
 let riskData = {};
-
+let dashboardData = {};
 
 /* =========================
    LOAD RISK DATA
@@ -142,7 +142,7 @@ function loadMap() {
 
                             e.target.setStyle({
 
-                                fillColor: "#8B0000",
+                                fillColor: "#155f97",
 
                                 fillOpacity: 1
                             });
@@ -240,3 +240,281 @@ window.addEventListener("scroll", () => {
         `translateY(calc(-50% - ${scrollY * 0.2}px))`;
 
 });
+
+
+fetch("dashboard_data.json")
+    .then(response => response.json())
+    .then(data => {
+
+        dashboardData = data;
+
+        loadDashboard();
+
+    });
+
+function loadDashboard() {
+
+    const plotTheme = {
+        paper_bgcolor: "rgba(239, 239, 239, 0)",
+        plot_bgcolor: "rgba(0,0,0,0)",
+        font: {
+            color: "#ffffff",
+            family: "Poppins"
+        },
+        xaxis: {
+            gridcolor: "rgba(255,255,255,0.08)",
+            zerolinecolor: "rgba(255,255,255,0.08)"
+        },
+        yaxis: {
+            gridcolor: "rgba(255,255,255,0.08)",
+            zerolinecolor: "rgba(255,255,255,0.08)"
+        }
+    };
+
+
+    /* =========================
+       ROC TRAIN
+    ========================= */
+
+    Plotly.newPlot("roc-train", [{
+        x: dashboardData.roc_train.fpr,
+        y: dashboardData.roc_train.tpr,
+        mode: "lines",
+        name: "Train ROC",
+        line: {
+            color: "#ffffff",
+            width: 4
+        }
+    },
+    {
+        x: [0,1],
+        y: [0,1],
+        mode: "lines",
+        name: "Baseline",
+        line: {
+            color: "#580000",
+            dash: "dash"
+        }
+    }], {
+        ...plotTheme,
+        title: "ROC Curve - Train",
+        autosize: true,
+        height: 520
+    });
+
+
+    /* =========================
+       ROC TEST
+    ========================= */
+
+    Plotly.newPlot("roc-test", [{
+        x: dashboardData.roc_test.fpr,
+        y: dashboardData.roc_test.tpr,
+        mode: "lines",
+        name: "Test ROC",
+        line: {
+            color: "#fffefe",
+            width: 4
+        }
+    },
+    {
+        x: [0,1],
+        y: [0,1],
+        mode: "lines",
+        name: "Baseline",
+        line: {
+            color: "#580000",
+            dash: "dash"
+        }
+    }], {
+        ...plotTheme,
+        title: "ROC Curve - Test",
+        autosize: true,
+        height: 520
+    });
+
+
+    /* =========================
+       CONFUSION MATRIX TRAIN
+    ========================= */
+
+    const cmTrain = dashboardData.cm_train;
+
+    Plotly.newPlot("cm-train", [{
+        z: cmTrain,
+        type: "heatmap",
+        colorscale: [[0, "#d6d6d6"],[1, "#101010"]],
+        showscale: false,
+        text: [
+            [`TN<br>${cmTrain[0][0]}`, `FP<br>${cmTrain[0][1]}`],
+            [`FN<br>${cmTrain[1][0]}`, `TP<br>${cmTrain[1][1]}`]
+        ],
+        texttemplate: "%{text}",
+        textfont: {
+            color: "#ffffff",
+            size: 24,
+            family: "Poppins"
+        },
+        hoverinfo: "skip"
+    }], {
+        ...plotTheme,
+        title: "Confusion Matrix - Train",
+        autosize: true,
+        height: 520,
+        xaxis: {
+            title: "Predicted Label",
+            tickvals: [0,1],
+            ticktext: ["0","1"]
+        },
+        yaxis: {
+            title: "True Label",
+            tickvals: [0,1],
+            ticktext: ["0","1"],
+            autorange: "reversed"
+        }
+    });
+
+
+    /* =========================
+       CONFUSION MATRIX TEST
+    ========================= */
+
+    const cmTest = dashboardData.cm_test;
+
+    Plotly.newPlot("cm-test", [{
+        z: cmTest,
+        type: "heatmap",
+        colorscale: [[0, "#d6d6d6"],[1, "#101010"]],
+        showscale: false,
+        text: [
+            [`TN<br>${cmTest[0][0]}`, `FP<br>${cmTest[0][1]}`],
+            [`FN<br>${cmTest[1][0]}`, `TP<br>${cmTest[1][1]}`]
+        ],
+        texttemplate: "%{text}",
+        textfont: {
+            color: "#ffffff",
+            size: 24,
+            family: "Poppins"
+        },
+        hoverinfo: "skip"
+    }], {
+        ...plotTheme,
+        title: "Confusion Matrix - Test",
+        autosize: true,
+        height: 520,
+        xaxis: {
+            title: "Predicted Label",
+            tickvals: [0,1],
+            ticktext: ["0","1"]
+        },
+        yaxis: {
+            title: "True Label",
+            tickvals: [0,1],
+            ticktext: ["0","1"],
+            autorange: "reversed"
+        }
+    });
+
+
+    /* =========================
+       DENSITY TRAIN
+    ========================= */
+
+    Plotly.newPlot("density-train", [
+
+        {
+            x: dashboardData.density_train.approved,
+            type: "histogram",
+            histnorm: "probability density",
+            opacity: 0.55,
+            name: "Approved",
+            marker: {
+                color: "#313131"
+            }
+        },
+
+        {
+            x: dashboardData.density_train.denied,
+            type: "histogram",
+            histnorm: "probability density",
+            opacity: 0.55,
+            name: "Denied",
+            marker: {
+                color: "#868686"
+            }
+        }
+
+    ], {
+
+        ...plotTheme,
+
+        title: "Probability Density - Train",
+
+        barmode: "overlay",
+
+        autosize: true,
+
+        height: 520,
+
+        xaxis: {
+            title: "Predicted Probability"
+        },
+
+        yaxis: {
+            title: "Density"
+        }
+
+    });
+
+
+    /* =========================
+       DENSITY TEST
+    ========================= */
+
+    Plotly.newPlot("density-test", [
+
+        {
+            x: dashboardData.density_test.approved,
+            type: "histogram",
+            histnorm: "probability density",
+            opacity: 0.55,
+            name: "Approved",
+            marker: {
+                color: "#e2dcdc"
+            }
+        },
+
+        {
+            x: dashboardData.density_test.denied,
+            type: "histogram",
+            histnorm: "probability density",
+            opacity: 0.55,
+            name: "Denied",
+            marker: {
+                color: "#868686"
+            }
+        }
+
+    ], {
+
+        ...plotTheme,
+
+        title: "Probability Density - Test",
+
+        barmode: "overlay",
+
+        autosize: true,
+
+        height: 520,
+
+        xaxis: {
+            title: "Predicted Probability"
+        },
+
+        yaxis: {
+            title: "Density"
+        }
+
+    });
+
+}

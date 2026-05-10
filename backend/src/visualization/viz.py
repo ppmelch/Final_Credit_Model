@@ -1,3 +1,4 @@
+import json
 import warnings
 import numpy as np
 import pandas as pd
@@ -6,6 +7,8 @@ import matplotlib.pyplot as plt
 from sklearn.calibration import calibration_curve
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.metrics import auc, roc_curve, confusion_matrix as sk_confusion_matrix
+
+from backend.src.modeling.geospatial_risk import BASE_DIR, FRONTEND_DIR
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -550,3 +553,79 @@ class Visualization:
             y='interest_rate_model'
         )
         '''
+        
+    def export_dashboard_data(self, results):
+
+        fpr_train, tpr_train, _ = roc_curve(
+            results["y_train"],
+            results["y_train_prob"]
+        )
+
+        fpr_test, tpr_test, _ = roc_curve(
+            results["y_test"],
+            results["y_prob"]
+        )
+
+        cm_train = sk_confusion_matrix(
+            results["y_train"],
+            results["y_train_pred"]
+        )
+
+        cm_test = sk_confusion_matrix(
+            results["y_test"],
+            results["y_pred"]
+        )
+
+        dashboard_data = {
+
+            "roc_train": {
+                "fpr": fpr_train.tolist(),
+                "tpr": tpr_train.tolist()
+            },
+
+            "roc_test": {
+                "fpr": fpr_test.tolist(),
+                "tpr": tpr_test.tolist()
+            },
+
+            "cm_train": cm_train.tolist(),
+
+            "cm_test": cm_test.tolist(),
+
+            "density_train": {
+                "approved":
+                    results["y_train_prob"][
+                        results["y_train"] == 0
+                    ].tolist(),
+
+                "denied":
+                    results["y_train_prob"][
+                        results["y_train"] == 1
+                    ].tolist()
+            },
+
+
+
+
+
+            "density_test": {
+                "approved":
+                    results["y_prob"][
+                        results["y_test"] == 0
+                    ].tolist(),
+
+                "denied":
+                    results["y_prob"][
+                        results["y_test"] == 1
+                    ].tolist()
+            }
+
+        }
+
+        output_path = (
+            FRONTEND_DIR / "dashboard_data.json"
+        )
+
+        with open(output_path, "w") as f:
+
+            json.dump(dashboard_data, f)
