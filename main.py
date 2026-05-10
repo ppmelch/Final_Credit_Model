@@ -42,10 +42,10 @@ def main():
 
     # == Visualizations ==
     viz = Visualization()
-    viz.plot_all(results, data_final)
+    #viz.plot_all(results, data_final)
 
     # == Save results (optional) ==
-    #data_final.to_csv("data/results.csv", index=False)
+    data_final.to_csv("data/results.csv", index=False)
 
 if __name__ == "__main__":
     main()

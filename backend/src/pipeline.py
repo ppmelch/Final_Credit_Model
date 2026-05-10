@@ -1,12 +1,11 @@
 from backend.src.modeling.model import Model
-from backend.src.modeling.config import MODEL_CONFIG, MODELS_DIR
+from backend.src.modeling.config import MODELS_DIR
 from backend.src.data.data_splitter import DataSplitter
 from backend.src.data.data_preparation import DataPreparation
+from backend.src.modeling.business_logic import BusinessLogic
+from backend.src.modeling.geospatial_risk import GeospatialRisk
+from backend.src.modeling.risk_calculator import RiskCalculator
 from backend.src.modeling.model_evaluation import ModelEvaluation
-import warnings
-
-warnings.filterwarnings("ignore")
-
 
 
 class CreditPipeline:
@@ -39,7 +38,7 @@ class CreditPipeline:
                 # === TEST ===
         y_test_pred = model.predict(X_test)
         y_test_proba = model.predict_proba(X_test)
-        
+
         # 4.2 Model evaluation
         evaluator = ModelEvaluation()
         
@@ -53,11 +52,34 @@ class CreditPipeline:
         )
         
         
-        # LOGICA de negocio para decidir si el modelo es lo suficientemente bueno para ser guardado y desplegado
-  
-        
+        # 5. Risk metrics calculation and business logic application
+        risk = RiskCalculator(lgd=0.45)
+        pd_values = risk.calculate_pd(model, X)
+        self.data["predicted_pd"] = pd_values
+
+        # 5.1 Risk metrics
+        ead = risk.calculate_ead(self.data)
+        lgd = risk.calculate_lgd(self.data)
+
+        self.data["expected_loss"] = risk.calculate_expected_loss(
+            pd_values, lgd, ead
+        )
+
+        # 5.2 Business logic
+        logic = BusinessLogic(threshold=0.4, LGD=0.45 , rf=0.0364,
+                 inflation_premium=0.024, liquidity_premium=0.0326, admin_cost=0.02, profit_margin=0.0116)
+        self.data["decision"] = logic.credit_decision(pd_values)
+        self.data["risk_bucket"] = logic.risk_buckets(pd_values)
+        self.data["interest_rate_model"] = logic.calculate_interest_rate(pd_values)
+
+                
         # Save Model
         model.save_model(f"{self.model_name}.pkl", MODELS_DIR)
+        
+        
+        # Geospatial analysis (if applicable)
+        geo = GeospatialRisk()
+        municipality_risk = (geo.build_municipality_risk(self.data))
         
         # 6. Deployment (if applicable)
         

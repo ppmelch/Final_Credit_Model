@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Jalisco Credit Risk Map</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet/dist/leaflet.css"
+    />
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+</head>
+
+<body>
+
+
+    <!-- =========================
+         HERO SECTION
+    ========================== -->
+
+    <section class="hero-section">
+
+
+        <!-- NAVBAR -->
+
+        <header class="navbar">
+
+            <div class="logo">
+
+                <span class="logo-line"></span>
+
+                <h1>Jalisco Risk Analytics</h1>
+
+            </div>
+
+
+            <nav class="nav-links">
+
+                <a href="#">Overview</a>
+                <a href="#">Models</a>
+                <a href="#">Geospatial</a>
+
+            </nav>
+
+
+            <div class="nav-actions">
+
+                <button class="location-btn">
+                    Jalisco
+                </button>
+
+                <button class="search-btn">
+                    🔍
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- HERO CONTENT -->
+
+        <div class="hero-content">
+
+            <h1>
+                JALISCO CREDIT RISK:
+                <br>
+                GEOSPATIAL ANALYTICS
+            </h1>
+
+            <p>
+                Machine learning driven municipality
+                credit risk visualization platform.
+            </p>
+
+            <button>
+                Explore Risk
+            </button>
+
+        </div>
+
+
+        <div id="municipality-card">
+
+            <h2 id="municipality-name">
+            </h2>
+
+            <div class="municipality-info">
+
+                <p>
+                    PD: <span id="municipality-pd">12.4%</span>
+                </p>
+
+                <p>
+                    Expected Loss:
+                    <span id="municipality-el">
+                        $120,000
+                    </span>
+                </p>
+
+                <p>
+                    Approval Rate:
+                    <span id="municipality-approval">
+                        83%
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MAP -->
+
+        <div id="map"></div>
+
+    </section>
+
+
+    
+    <selection class="divider-section">
+        <div class="divider"></div>
+    </selection>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="footer">
+
+        <div class="footer-right">
+
+            <p>
+                Built with Python, XGBoost,
+                LightGBM, Flask & Leaflet.
+            </p>
+
+            <span>
+                © 2026 Jalisco Risk Analytics
+            </span>
+
+        </div>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+
+
+
+</body>
+
+</html>
