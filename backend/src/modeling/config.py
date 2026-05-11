@@ -56,7 +56,45 @@ MODEL_CONFIG = {
         "reg_alpha": 2,
         "reg_lambda": 3,
         "class_weight": "balanced",
-        "random_state": 42
+        "random_state": 42,
+        "verbosity": -1
+    }
+}
+
+
+OPTUNA_SEARCH_SPACE = {
+
+    "xgboost": {
+
+        "max_depth": {
+            "type": "int",
+            "low": 3,
+            "high": 10
+        },
+
+        "learning_rate": {
+            "type": "float",
+            "low": 0.01,
+            "high": 0.2
+        }
+    },
+
+    "random_forest": {
+
+        "n_estimators": {
+            "type": "int",
+            "low": 100,
+            "high": 1000
+        }
+    },
+
+    "lightgbm": {
+
+        "num_leaves": {
+            "type": "int",
+            "low": 20,
+            "high": 50
+        }
     }
 }
 

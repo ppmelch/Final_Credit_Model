@@ -1,4 +1,5 @@
 import pandas as pd
+from backend.src.modeling.experiment_runner import ExperimentRunner
 from backend.src.pipeline import CreditPipeline
 from backend.src.utils.prints import PrintUtils
 from backend.src.visualization.viz import Visualization
@@ -32,7 +33,15 @@ def main():
 
     # == Initialize pipeline ==
     # Options: 'logistic', 'random_forest', 'xgboost', 'lightgbm'
-    pipeline = CreditPipeline(data=data, model_name="random_forest")
+    #pipeline = CreditPipeline(data=data, model_name="random_forest")
+        
+    # BENCHMARK + MLFLOW
+    runner = ExperimentRunner(data=data)
+
+    best_model = runner.run()
+
+    # Pipeline with best model
+    pipeline = CreditPipeline(data=data, model_name=best_model)
 
     # == Run pipeline ==
     results, data_final = pipeline.run()
