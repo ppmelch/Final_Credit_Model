@@ -76,7 +76,7 @@ class CreditPipeline:
 
         # 8. Business logic
         logic = BusinessLogic(
-            threshold=best_threshold,
+            threshold= best_threshold, #0.5737
             LGD=0.45,
             rf=0.069971,
             spread_fondeo=0.03,
