@@ -53,7 +53,7 @@ class GeospatialRisk:
             orient="records",
             force_ascii=False
         )
-        
+
         print(BASE_DIR)
         print(FRONTEND_DIR)
 

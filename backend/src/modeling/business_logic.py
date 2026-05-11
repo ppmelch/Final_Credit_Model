@@ -13,7 +13,7 @@ class BusinessLogic:
         Clients with PD below this threshold are approved.
     """
 
-    def __init__(self, threshold=0.5, LGD=0.45 , rf=0.069971,
+    def __init__(self, threshold=0.5, LGD=0.45, rf=0.069971,
                  spread_fondeo=0.03, operating_cost=0.035, capital_cost=0.0189, profit_margin=0.015):
         self.threshold = threshold
         self.LGD = LGD
@@ -57,19 +57,16 @@ class BusinessLogic:
             bins=[0, 0.33, 0.66, 1],
             labels=["Low", "Medium", "High"]
         )
-    
+
     def calculate_interest_rate(self, pd_values: pd.Series) -> pd.Series:
         """
         Calculate interest rate based on risk (PD).
 
         Higher PD -> higher interest rate.
         """
-        
-        risk_premium = pd_values * self.LGD 
-        
+
+        risk_premium = pd_values * self.LGD
+
         # rf + spread_fondeo + risk_premium + costos_operativos + costo_capital + Margen de utilidad
-        
+
         return self.rf + self.sfondeo + risk_premium + self.coper + self.ccapital + self.m
-    
-    
-    

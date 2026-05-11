@@ -41,4 +41,4 @@ class DataSplitter:
         Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]
             X_train, X_test, y_train, y_test
         """
-        return train_test_split(X, y, test_size=self.test_size, random_state=self.random_state , stratify=y)
+        return train_test_split(X, y, test_size=self.test_size, random_state=self.random_state, stratify=y)

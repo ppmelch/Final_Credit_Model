@@ -17,6 +17,29 @@ class CreditPipeline:
         self.model_name = model_name
 
     def run(self):
+        """
+        Execute the credit risk modeling pipeline.
+        Workflow
+        --------
+        1. Data ingestion and preprocessing
+        2. Train-test split
+        3. Model selection and training
+        4. Predictions
+        5. Threshold optimization (Optuna)
+        6. Model evaluation
+        7. Risk metrics
+        8. Business logic
+        9. Save model
+        10. Geospatial analysis
+        11. Return results
+        Notes
+        -----
+        - The pipeline encapsulates the full modeling process, including:
+            * Data preprocessing
+            * Model training (e.g., Random Forest)
+            * Probability of Default (PD) estimation
+            * Risk metric computation
+        """
 
         # 1. Data ingestion and preprocessing
         prep = DataPreparation(self.data)
@@ -27,7 +50,8 @@ class CreditPipeline:
         X_train, X_test, y_train, y_test = splitter.split(X, y)
 
         # 3. Model selection and training
-        model = Model.get_model("classification", self.model_name, y_train=y_train)
+        model = Model.get_model(
+            "classification", self.model_name, y_train=y_train)
         model.train(X_train, y_train)
 
         # 4. Predictions
@@ -72,11 +96,12 @@ class CreditPipeline:
 
         lgd = risk.calculate_lgd(self.data)
 
-        self.data["expected_loss"] = risk.calculate_expected_loss(pd_values, lgd, ead)
+        self.data["expected_loss"] = risk.calculate_expected_loss(
+            pd_values, lgd, ead)
 
         # 8. Business logic
         logic = BusinessLogic(
-            threshold= best_threshold, #0.5737
+            threshold=best_threshold,  # 0.5737
             LGD=0.45,
             rf=0.069971,
             spread_fondeo=0.03,
@@ -89,7 +114,8 @@ class CreditPipeline:
 
         self.data["risk_bucket"] = logic.risk_buckets(pd_values)
 
-        self.data["interest_rate_model"] = logic.calculate_interest_rate(pd_values)
+        self.data["interest_rate_model"] = logic.calculate_interest_rate(
+            pd_values)
 
         # 9. Save model
         model.save_model(f"{self.model_name}.pkl", MODELS_DIR)
@@ -101,4 +127,3 @@ class CreditPipeline:
 
         # 11. Return results
         return results, self.data
-

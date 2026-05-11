@@ -23,13 +23,11 @@ class ThresholdOptimizer:
              float
                  The optimal threshold value that maximizes the F1 score.
     """
-    
 
     def __init__(self, y_true, y_prob):
 
         self.y_true = y_true
         self.y_prob = y_prob
-
 
     def optimize_threshold(self, n_trials=100):
 
@@ -51,7 +49,6 @@ class ThresholdOptimizer:
             )
 
             return score
-
 
         study = optuna.create_study(
             direction="maximize"

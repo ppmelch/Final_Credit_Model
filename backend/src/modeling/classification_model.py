@@ -8,6 +8,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from backend.src.modeling.config import MODEL_CONFIG
 from backend.src.modeling.base_model import BaseModel
 
+
 class ClassificationModel(BaseModel):
     """
     Wrapper class for classification models with support for multiple algorithms.
@@ -24,7 +25,7 @@ class ClassificationModel(BaseModel):
     - Additional models can be added by extending the initialization logic and updating the configuration.
     """
 
-    def __init__(self, model_name: str , **kwargs) -> None:
+    def __init__(self, model_name: str, **kwargs) -> None:
         """
         Initialize the classification model based on the specified model name.
 
@@ -32,7 +33,7 @@ class ClassificationModel(BaseModel):
         ----------
         model_name : str
             - Name of the model to initialize. 
-            
+
             - Supported values are:
             'logistic', 'random_forest', 'xgboost', 'lightgbm'.
 
@@ -53,7 +54,7 @@ class ClassificationModel(BaseModel):
 
         elif model_name == "xgboost":
             self.model = XGBClassifier(**self.config)
-            
+
         elif model_name == "lightgbm":
             self.model = LGBMClassifier(**self.config)
 
@@ -72,7 +73,7 @@ class ClassificationModel(BaseModel):
             Target variable (binary classification).
         """
         self.model.fit(X, y)
-        
+
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
         Generate class predictions for the input data.

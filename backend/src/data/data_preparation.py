@@ -80,7 +80,7 @@ class DataPreparation:
 
         # Features
         X = self.data.drop(
-            columns=["default_12m" , "cve_municipio"]
+            columns=["default_12m", "cve_municipio"]
         )
 
         # Encoding

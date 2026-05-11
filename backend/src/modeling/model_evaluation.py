@@ -107,8 +107,8 @@ class ModelEvaluation:
         
         return results
         '''
-        
-    def evaluate_full(self, y_train,y_train_pred ,y_train_proba, y_test, y_test_pred, y_test_proba):
+
+    def evaluate_full(self, y_train, y_train_pred, y_train_proba, y_test, y_test_pred, y_test_proba):
         """
         Perform full train/test evaluation and return structured results.
 
