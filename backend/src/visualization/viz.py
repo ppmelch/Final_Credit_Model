@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
 from sklearn.calibration import calibration_curve
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.metrics import auc, roc_curve, confusion_matrix as sk_confusion_matrix
@@ -432,6 +433,31 @@ class Visualization:
 
         plt.tight_layout()
         plt.show()
+        
+    def build_density_data(self, y_true, probabilities):
+
+        y_true = np.array(y_true)
+
+        approved = probabilities[y_true == 0]
+        denied = probabilities[y_true == 1]
+
+        x_range = np.linspace(0, 1, 200)
+
+        approved_kde = gaussian_kde(approved)
+        denied_kde = gaussian_kde(denied)
+
+        return {
+
+            "approved_x": x_range.tolist(),
+
+            "approved_y":
+                approved_kde(x_range).tolist(),
+
+            "denied_x": x_range.tolist(),
+
+            "denied_y":
+                denied_kde(x_range).tolist()
+        }
 
 
 
@@ -586,6 +612,12 @@ class Visualization:
             .value_counts()
             .sort_index()
         )
+        
+        interest_rate_bucket = (
+            data.groupby("risk_bucket")["interest_rate_model"]
+            .mean()
+            .reset_index()
+        )
 
         dashboard_data = {
 
@@ -603,38 +635,52 @@ class Visualization:
 
             "cm_test": cm_test.tolist(),
 
-            "density_train": {
-                "approved":
-                    results["y_train_prob"][
-                        results["y_train"] == 0
-                    ].tolist(),
+            "density_train": self.build_density_data(
+                results["y_train"],
+                results["y_train_prob"]
+            ),
 
-                "denied":
-                    results["y_train_prob"][
-                        results["y_train"] == 1
-                    ].tolist()
-            },
-
-            "density_test": {
-                "approved":
-                    results["y_prob"][
-                        results["y_test"] == 0
-                    ].tolist(),
-
-                "denied":
-                    results["y_prob"][
-                        results["y_test"] == 1
-                    ].tolist()
-            },
+            "density_test": self.build_density_data(
+                results["y_test"],
+                results["y_prob"]
+            ),
 
             "risk_bucket_train": {
-                "labels": risk_bucket_train.astype(str).tolist(),
-                "values": risk_bucket_train.values.tolist()
+                "labels": data.loc[results["y_train"].index, "risk_bucket"].astype(str).tolist(),
+                "values": data.loc[results["y_train"].index, "predicted_pd"].tolist()
             },
 
             "risk_bucket_test": {
-                "labels": risk_bucket_test.astype(str).tolist(),
-                "values": risk_bucket_test.values.tolist()
+                "labels": data.loc[results["y_test"].index, "risk_bucket"].astype(str).tolist(),
+                "values": data.loc[results["y_test"].index, "predicted_pd"].tolist()
+            },
+            
+            "interest_rate_train": {
+                "labels":
+                    data.loc[
+                        results["y_train"].index,
+                        "risk_bucket"
+                    ].astype(str).tolist(),
+
+                "values":
+                    data.loc[
+                        results["y_train"].index,
+                        "interest_rate_model"
+                    ].tolist()
+            },
+
+            "interest_rate_test": {
+                "labels":
+                    data.loc[
+                        results["y_test"].index,
+                        "risk_bucket"
+                    ].astype(str).tolist(),
+
+                "values":
+                    data.loc[
+                        results["y_test"].index,
+                        "interest_rate_model"
+                    ].tolist()
             }
 
         }

@@ -86,6 +86,9 @@ function loadMap() {
                     const municipalityName =
                         document.getElementById("municipality-name");
 
+                    const municipalityRisk =    
+                    document.getElementById("municipality-risk");
+
                     const municipalityPD =
                         document.getElementById("municipality-pd");
 
@@ -110,6 +113,24 @@ function loadMap() {
                             municipalityName.textContent =
                                 municipio;
 
+                            if (municipalityData.risk_bucket === "Low") {
+
+                                municipalityRisk.style.color = "#146a15";
+
+                            }
+
+                            else if (municipalityData.risk_bucket === "Medium") {
+
+                                municipalityRisk.style.color = "#d6a700";
+
+                            }
+
+                            else if (municipalityData.risk_bucket === "High") {
+
+                                municipalityRisk.style.color = "#8B0000";
+
+                            }
+
 
                             if (municipalityData) {
 
@@ -121,7 +142,8 @@ function loadMap() {
 
                                 municipalityApproval.textContent =
                                     `${(municipalityData.approval_rate * 100).toFixed(0)}%`;
-
+                                municipalityRisk.textContent =
+                                    municipalityData.risk_bucket;
                             }
 
                             else {
@@ -133,6 +155,9 @@ function loadMap() {
                                     "NO DATA";
 
                                 municipalityApproval.textContent =
+                                    "NO DATA";
+
+                                municipalityRisk.textContent =
                                     "NO DATA";
                             }
 
@@ -200,21 +225,18 @@ function loadMap() {
 function getColor(risk) {
 
     if (risk == null)
-        return "#4f4f4f";
+        return "#340000";
 
-    if (risk >= 0.65) /* This is the threshold for very high risk */
+    if (risk >= 0.66) /* This is the threshold for very high risk */
         return "#4a0404";
 
-    if (risk >= 0.50) /* This is the threshold for high risk */
-        return "#8B0000";
-
-    if (risk >= 0.35) /* This is the threshold for moderate risk */
+    if (risk >= 0.36) /* This is the threshold for moderate risk */
         return "#ce6f02";
 
-    if (risk >= 0.22) /* This is the threshold for low risk */
+    if (risk >= 0.1) /* This is the threshold for low risk */
         return "#146a15";
 
-    return "#3f634b";
+    return "#580000";
 }
 
 /* =========================
@@ -262,12 +284,13 @@ function loadDashboard() {
             family: "Poppins"
         },
         xaxis: {
-            gridcolor: "rgba(255,255,255,0.08)",
-            zerolinecolor: "rgba(255,255,255,0.08)"
+            showgrid: false,
+            zeroline: false,
         },
         yaxis: {
-            gridcolor: "rgba(255,255,255,0.08)",
-            zerolinecolor: "rgba(255,255,255,0.08)"
+            showgrid: true,
+            gridcolor: "rgba(255,255,255,0.2)",
+            zeroline: false
         }
     };
 
@@ -292,7 +315,7 @@ function loadDashboard() {
         mode: "lines",
         name: "Baseline",
         line: {
-            color: "#a40000",
+            color: "#de0000",
             dash: "dash"
         }
     }], {
@@ -323,7 +346,7 @@ function loadDashboard() {
         mode: "lines",
         name: "Baseline",
         line: {
-            color: "#b10000",
+            color: "#e20000",
             dash: "dash"
         }
     }], {
@@ -333,115 +356,217 @@ function loadDashboard() {
         height: 520
     });
 
-
-    /* =========================
-       CONFUSION MATRIX TRAIN
-    ========================= */
-
     const cmTrain = dashboardData.cm_train;
 
     Plotly.newPlot("cm-train", [{
         z: cmTrain,
         type: "heatmap",
-        colorscale: [[0, "#d6d6d6"],[1, "#101010"]],
-        showscale: false,
-        text: [
-            [`TN<br>${cmTrain[0][0]}`, `FP<br>${cmTrain[0][1]}`],
-            [`FN<br>${cmTrain[1][0]}`, `TP<br>${cmTrain[1][1]}`]
+        colorscale: [
+            [0, "#d6d6d6"],
+            [1, "#72946f"]
         ],
-        texttemplate: "%{text}",
-        textfont: {
-            color: "#ffffff",
-            size: 24,
-            family: "Poppins"
-        },
+        showscale: false,
         hoverinfo: "skip"
     }], {
         ...plotTheme,
+
         title: "Confusion Matrix - Train",
+
         autosize: true,
-        height: 520,
+
+        height: 700,
+
+        annotations: [
+
+            {
+                x: 0,
+                y: 0,
+                text: `TN<br>${cmTrain[0][0]}`,
+                showarrow: false,
+                font: {
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 1,
+                y: 0,
+                text: `FP<br>${cmTrain[0][1]}`,
+                showarrow: false,
+                font: {
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 0,
+                y: 1,
+                text: `FN<br>${cmTrain[1][0]}`,
+                showarrow: false,
+                font: {
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 1,
+                y: 1,
+                text: `TP<br>${cmTrain[1][1]}`,
+                showarrow: false,
+                font: {
+                    color: "#ae0000",
+                    size: 24
+                }
+            }
+
+        ],
+
         xaxis: {
             title: "Predicted Label",
-            tickvals: [0,1],
-            ticktext: ["0","1"]
+            tickvals: [0, 1],
+            ticktext: ["0", "1"],
+            showgrid: false,
+            zeroline: false
         },
+
         yaxis: {
             title: "True Label",
-            tickvals: [0,1],
-            ticktext: ["0","1"],
-            autorange: "reversed"
+            tickvals: [0, 1],
+            ticktext: ["0", "1"],
+            autorange: "reversed",
+            showgrid: false,
+            zeroline: false
         }
+
     });
 
 
-    /* =========================
-       CONFUSION MATRIX TEST
-    ========================= */
 
     const cmTest = dashboardData.cm_test;
 
     Plotly.newPlot("cm-test", [{
         z: cmTest,
         type: "heatmap",
-        colorscale: [[0, "#d6d6d6"],[1, "#101010"]],
-        showscale: false,
-        text: [
-            [`TN<br>${cmTest[0][0]}`, `FP<br>${cmTest[0][1]}`],
-            [`FN<br>${cmTest[1][0]}`, `TP<br>${cmTest[1][1]}`]
+        colorscale: [
+            [0, "#d6d6d6"],
+            [1, "#72946f"]
         ],
-        texttemplate: "%{text}",
-        textfont: {
-            color: "#ffffff",
-            size: 24,
-            family: "Poppins"
-        },
+        showscale: false,
         hoverinfo: "skip"
     }], {
         ...plotTheme,
+
         title: "Confusion Matrix - Test",
+
         autosize: true,
-        height: 520,
+
+        height: 700,
+
+        annotations: [
+
+            {
+                x: 0,
+                y: 0,
+                text: `TN<br>${cmTest[0][0]}`,
+                showarrow: false,
+                font: {
+                    font_family: "Poppins",
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 1,
+                y: 0,
+                text: `FP<br>${cmTest[0][1]}`,
+                showarrow: false,
+                font: {
+                    font_family: "Poppins",
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 0,
+                y: 1,
+                text: `FN<br>${cmTest[1][0]}`,
+                showarrow: false,
+                font: {
+                    font_family: "Poppins",
+                    color: "#ae0000",
+                    size: 24
+                }
+            },
+
+            {
+                x: 1,
+                y: 1,
+                text: `TP<br>${cmTest[1][1]}`,
+                showarrow: false,
+                font: {
+                    font_family: "Poppins",
+                    color: "#ae0000",
+                    size: 24
+                }
+            }
+
+        ],
+
         xaxis: {
             title: "Predicted Label",
-            tickvals: [0,1],
-            ticktext: ["0","1"]
+            tickvals: [0, 1],
+            ticktext: ["0", "1"],
+            showgrid: false,
+            zeroline: false
         },
+
         yaxis: {
             title: "True Label",
-            tickvals: [0,1],
-            ticktext: ["0","1"],
-            autorange: "reversed"
+            tickvals: [0, 1],
+            ticktext: ["0", "1"],
+            autorange: "reversed",
+            showgrid: false,
+            zeroline: false
         }
+
     });
-
-
     /* =========================
-       DENSITY TRAIN
-    ========================= */
+   DENSITY TRAIN
+========================= */
 
     Plotly.newPlot("density-train", [
 
         {
-            x: dashboardData.density_train.approved,
-            type: "histogram",
-            histnorm: "probability density",
-            opacity: 0.55,
+            x: dashboardData.density_train.approved_x,
+            y: dashboardData.density_train.approved_y,
+            mode: "lines",
             name: "Approved",
-            marker: {
-                color: "#f3f0f0"
-            }
+            line: {
+                color: "#d6d6d6",
+                width: 4,
+                shape: "spline"
+            },
+            fill: "tozeroy",
+            fillcolor: "rgba(214,214,214,0.28)"
         },
 
         {
-            x: dashboardData.density_train.denied,
-            type: "histogram",
-            histnorm: "probability density",
-            opacity: 0.55,
+            x: dashboardData.density_train.denied_x,
+            y: dashboardData.density_train.denied_y,
+            mode: "lines",
             name: "Denied",
-            marker: {
-                color: "#990000"
-            }
+            line: {
+                color: "#8B0000",
+                width: 4,
+                shape: "spline"
+            },
+            fill: "tozeroy",
+            fillcolor: "rgba(139,0,0,0.28)"
         }
 
     ], {
@@ -450,17 +575,17 @@ function loadDashboard() {
 
         title: "Probability Density - Train",
 
-        barmode: "overlay",
-
         autosize: true,
 
         height: 520,
 
         xaxis: {
+            ...plotTheme.xaxis,
             title: "Predicted Probability"
         },
 
         yaxis: {
+            ...plotTheme.yaxis,
             title: "Density"
         }
 
@@ -468,31 +593,37 @@ function loadDashboard() {
 
 
     /* =========================
-       DENSITY TEST
+    DENSITY TEST
     ========================= */
 
     Plotly.newPlot("density-test", [
 
         {
-            x: dashboardData.density_test.approved,
-            type: "histogram",
-            histnorm: "probability density",
-            opacity: 0.55,
+            x: dashboardData.density_test.approved_x,
+            y: dashboardData.density_test.approved_y,
+            mode: "lines",
             name: "Approved",
-            marker: {
-                color: "#e2dcdc"
-            }
+            line: {
+                color: "#d6d6d6",
+                width: 4,
+                shape: "spline"
+            },
+            fill: "tozeroy",
+            fillcolor: "rgba(214,214,214,0.28)"
         },
 
         {
-            x: dashboardData.density_test.denied,
-            type: "histogram",
-            histnorm: "probability density",
-            opacity: 0.55,
+            x: dashboardData.density_test.denied_x,
+            y: dashboardData.density_test.denied_y,
+            mode: "lines",
             name: "Denied",
-            marker: {
-                color: "#a40000"
-            }
+            line: {
+                color: "#8B0000",
+                width: 4,
+                shape: "spline"
+            },
+            fill: "tozeroy",
+            fillcolor: "rgba(139,0,0,0.28)"
         }
 
     ], {
@@ -501,17 +632,17 @@ function loadDashboard() {
 
         title: "Probability Density - Test",
 
-        barmode: "overlay",
-
         autosize: true,
 
         height: 520,
 
         xaxis: {
+            ...plotTheme.xaxis,
             title: "Predicted Probability"
         },
 
         yaxis: {
+            ...plotTheme.yaxis,
             title: "Density"
         }
 
@@ -520,54 +651,145 @@ function loadDashboard() {
 
 
     /* =========================
-    RISK BUCKET - TRAIN
+    RISK BUCKET 
     ========================= */
+        
 
-    Plotly.newPlot("risk-bucket-train", [{
+        Plotly.newPlot("risk-bucket-train", [{
+        type: "violin",
         x: dashboardData.risk_bucket_train.labels,
         y: dashboardData.risk_bucket_train.values,
-        type: "bar",
-        marker: {
-            color: [
-                "#3f634b",
-                "#d6a700",
-                "#8B0000"
-            ]
-        }
+        points: false,
+        box: {
+            visible: true
+        },
+        meanline: {
+            visible: true
+        },
+        line: {
+            color: "#8e0606"
+        },
+        fillcolor: "rgba(134,134,134,0.45)"
     }], {
         ...plotTheme,
         title: "Risk Buckets - Train",
         autosize: true,
         height: 520,
         xaxis: {
-            title: "Risk Bucket"
+            title: "Risk Bucket",
+            showgrid: false,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
         },
         yaxis: {
-            title: "Count"
+            title: "Predicted PD",
+            showgrid: true,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
         }
     });
 
+
     Plotly.newPlot("risk-bucket-test", [{
+        type: "violin",
         x: dashboardData.risk_bucket_test.labels,
         y: dashboardData.risk_bucket_test.values,
-        type: "bar",
-        marker: {
-            color: [
-                "#3f634b",
-                "#d6a700",
-                "#8B0000"
-            ]
-        }
+        points: false,
+        box: {
+            visible: true
+        },
+        meanline: {
+            visible: true
+        },
+        line: {
+            color: "#8e0606"
+        },
+        fillcolor: "rgba(134,134,134,0.35)"
     }], {
         ...plotTheme,
         title: "Risk Buckets - Test",
         autosize: true,
         height: 520,
         xaxis: {
-            title: "Risk Bucket"
+            title: "Risk Bucket",
+            showgrid: false,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
         },
         yaxis: {
-            title: "Count"
+            title: "Predicted PD",
+            showgrid: true,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
+        }
+    });
+
+    Plotly.newPlot("interest-rate-train", [{
+        type: "violin",
+        x: dashboardData.interest_rate_train.labels,
+        y: dashboardData.interest_rate_train.values,
+        points: false,
+        box: {
+            visible: true
+        },
+        meanline: {
+            visible: true
+        },
+        line: {
+            color: "#8e0606"
+        },
+        fillcolor: "rgba(134,134,134,0.45)"
+    }], {
+        ...plotTheme,
+        title: "Interest Rate by Risk Bucket - Train",
+        autosize: true,
+        height: 520,
+        xaxis: {
+            title: "Risk Bucket",
+            showgrid: false,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
+        },
+        yaxis: {
+            title: "Interest Rate",
+            showgrid: true,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
+        }
+    });
+
+
+    Plotly.newPlot("interest-rate-test", [{
+        type: "violin",
+        x: dashboardData.interest_rate_test.labels,
+        y: dashboardData.interest_rate_test.values,
+        points: false,
+        box: {
+            visible: true
+        },
+        meanline: {
+            visible: true
+        },
+        line: {
+            color: "#8e0606"
+        },
+        fillcolor: "rgba(134,134,134,0.35)"
+    }], {
+        ...plotTheme,
+        title: "Interest Rate by Risk Bucket - Test",
+        autosize: true,
+        height: 520,
+        xaxis: {
+            title: "Risk Bucket",
+            showgrid: false,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
+        },
+        yaxis: {
+            title: "Interest Rate",
+            showgrid: true,
+            gridcolor: "rgba(255,255,255,0.06)",
+            zeroline: false
         }
     });
 

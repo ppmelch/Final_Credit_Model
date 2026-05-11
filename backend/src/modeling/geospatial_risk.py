@@ -38,7 +38,8 @@ class GeospatialRisk:
 
         municipality_risk = data.groupby("municipio").agg({
             "predicted_pd": "mean",
-            "expected_loss": "sum"
+            "expected_loss": "sum",
+            "risk_bucket": lambda x: x.mode()[0]
         }).reset_index()
 
         municipality_risk["approval_rate"] = (

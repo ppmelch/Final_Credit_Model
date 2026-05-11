@@ -69,6 +69,23 @@ class PrintUtils:
             self.data.groupby('risk_bucket')[
                 ['predicted_pd', 'expected_loss']].mean()
         )
+        
+    def interest_rate_bucket (self) -> None:
+        """
+        Display average interest rate by risk bucket.
+
+        Notes
+        -----
+        Aggregates the following metrics by risk segment:
+        - interest_rate_model
+
+        Useful for analyzing whether pricing is aligned with risk levels.
+        """
+        print("\n=== Risk Buckets (Interest Rate) ===")
+        print(
+            self.data.groupby('risk_bucket')[
+                ['interest_rate_model']].mean().reset_index()
+        )
 
     def print_pricing_analysis(self) -> None:
         """
@@ -85,7 +102,7 @@ class PrintUtils:
         print("\n=== PD vs Interest Rate ===")
         print(
             self.data.groupby('risk_bucket')[
-                ['predicted_pd', 'interest_rate_model']].mean()
+                ['predicted_pd', 'interest_rate_model']].mean().reset_index()
         )
 
     def print_all(self, results: dict) -> None:

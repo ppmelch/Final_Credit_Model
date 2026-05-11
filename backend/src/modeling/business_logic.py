@@ -47,30 +47,16 @@ class BusinessLogic:
         """
         return (pd_values < self.threshold).astype(int)
 
-    def risk_buckets(self, pd_values: pd.Series, q=5) -> pd.Series:
+    def risk_buckets(self, pd_values):
         """
-        Segment clients into risk buckets based on PD quantiles.
-
-        Parameters
-        ----------
-        pd_values : pd.Series
-            Series containing Probability of Default (PD) values.
-        q : int, default=5
-            Number of quantile-based buckets (e.g., 5 = quintiles).
-
-        Returns
-        -------
-        pd.Series
-            Categorical series indicating the risk bucket assigned to each client.
-
-        Notes
-        -----
-        - Buckets are created using quantiles (equal-sized groups).
-        - Lower buckets correspond to lower risk (lower PD).
-        - Useful for portfolio segmentation, pricing strategies, and monitoring.
-        - If there are too many duplicate PD values, pd.qcut may raise an error.
+        Assign risk categories based on predicted probability of default.
         """
-        return pd.qcut(pd_values, q=q)
+
+        return pd.cut(
+            pd_values,
+            bins=[0, 0.33, 0.66, 1],
+            labels=["Low", "Medium", "High"]
+        )
     
     def calculate_interest_rate(self, pd_values: pd.Series) -> pd.Series:
         """

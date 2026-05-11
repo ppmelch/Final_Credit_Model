@@ -58,12 +58,21 @@
 
             <div class="nav-actions">
 
+                <form class="search-box">
+
+                    <input
+                        type="text"
+                        placeholder=" "
+                    >
+
+                    <button type="reset"></button>
+
+                </form>
+
+
+
                 <button class="location-btn">
                     Jalisco
-                </button>
-
-                <button class="search-btn">
-                    🔍
                 </button>
 
             </div>
@@ -86,9 +95,11 @@
                 credit risk visualization platform.
             </p>
 
-            <button>
-                Explore Risk
-            </button>
+            <a href="#model-results" class="explore-link">
+                <button>
+                    Explore Results
+                </button>
+            </a>
 
         </div>
 
@@ -99,6 +110,14 @@
             </h2>
 
             <div class="municipality-info">
+
+
+                <p>
+                    Risk Bucket:
+                    <span id="municipality-risk">
+                        Medium
+                    </span>
+                </p>
 
                 <p>
                     PD: <span id="municipality-pd">12.4%</span>
@@ -139,7 +158,7 @@
     <!-- =========================
          Model Results
     ========================== -->
-<section class="charts-section">
+<section class="charts-section"  id="model-results">
 
     <h1>
         ML Model Performance
@@ -165,22 +184,6 @@
     </div>
 
 
-    <!-- DENSITY -->
-    <div class="chart-row">
-
-        <div class="chart-card">
-            <h2>Probability Density - Train</h2>
-            <div id="density-train"></div>
-        </div>
-
-        <div class="chart-card">
-            <h2>Probability Density - Test</h2>
-            <div id="density-test"></div>
-        </div>
-
-    </div>
-
-
     <!-- CONFUSION -->
     <div class="chart-row">
 
@@ -195,25 +198,6 @@
         </div>
 
     </div>
-
-
-    <!-- CALIBRATION -->
-    <div class="chart-row">
-
-        <div class="chart-card">
-            <h2>Calibration Curve - Train</h2>
-            <div id="calibration-train"></div>
-        </div>
-
-        <div class="chart-card">
-            <h2>Calibration Curve - Test</h2>
-            <div id="calibration-test"></div>
-        </div>
-
-    </div>
-
-
-
 
         <!-- Risk-buckets -->
     <div class="chart-row">
@@ -230,6 +214,36 @@
 
     </div>
 
+
+            <!-- Interest Rate by Risk Bucket -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>Interest Rate by Risk Bucket - Train</h2>
+            <div id="interest-rate-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Interest Rate by Risk Bucket - Test</h2>
+            <div id="interest-rate-test"></div>
+        </div>
+
+    </div>
+
+    <!-- DENSITY -->
+    <div class="chart-row">
+
+        <div class="chart-card">
+            <h2>Probability Density - Train</h2>
+            <div id="density-train"></div>
+        </div>
+
+        <div class="chart-card">
+            <h2>Probability Density - Test</h2>
+            <div id="density-test"></div>
+        </div>
+
+    </div>
 
 </section>
 

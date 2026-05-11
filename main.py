@@ -31,7 +31,8 @@ def main():
     data = pd.read_csv("data/dataset_modelado_final.csv")
 
     # == Initialize pipeline ==
-    pipeline = CreditPipeline(data=data, model_name="random_forest")  # Options: 'logistic', 'random_forest', 'xgboost', 'lightgbm'
+    # Options: 'logistic', 'random_forest', 'xgboost', 'lightgbm'
+    pipeline = CreditPipeline(data=data, model_name="random_forest")
 
     # == Run pipeline ==
     results, data_final = pipeline.run()
@@ -42,11 +43,12 @@ def main():
 
     # == Visualizations ==
     viz = Visualization()
-    #viz.plot_all(results, data_final)
-    viz.export_dashboard_data(results , data_final)
+    # viz.plot_all(results, data_final)
+    viz.export_dashboard_data(results, data_final)
 
     # == Save results (optional) ==
     data_final.to_csv("data/results.csv", index=False)
+
 
 if __name__ == "__main__":
     main()
