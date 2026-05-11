@@ -10,13 +10,60 @@ from backend.src.modeling.threshold_optimization import ThresholdOptimizer
 
 
 class CreditPipeline:
-    '''Pipeline for credit risk modeling.'''
+    '''
+    End-to-end pipeline for credit risk modeling.
+
+    This pipeline automates:
+    - Data preparation
+    - Train-test split
+    - Model training
+    - Probability prediction
+    - Threshold optimization
+    - Model evaluation
+    - Risk metric computation
+    - Business decision logic
+    - Geospatial risk analysis
+    - Model persistence
+    '''
 
     def __init__(self, data, model_name="random_forest"):
+        '''
+        Initialize the credit risk pipeline.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            Input dataset used for modeling.
+
+        model_name : str, optional
+            Machine learning model to use.
+            Default is "random_forest".
+        '''
+
         self.data = data
         self.model_name = model_name
 
     def train_and_evaluate(self):
+        '''
+        Train and evaluate the selected machine learning model.
+
+        Workflow
+        --------
+        1. Data preparation
+        2. Train-test split
+        3. Model training
+        4. Probability prediction
+        5. Threshold optimization using Optuna
+        6. Model evaluation
+
+        Returns
+        -------
+        dict
+            Dictionary containing:
+            - results : evaluation metrics
+            - model : trained model object
+            - X : processed feature matrix
+        '''
 
         # 1. Data preparation
         prep = DataPreparation(self.data)
@@ -64,6 +111,32 @@ class CreditPipeline:
         }
 
     def run(self):
+        '''
+        Execute the complete credit risk pipeline.
+
+        Workflow
+        --------
+        1. Train and evaluate the model
+        2. Compute risk metrics
+        3. Apply business decision logic
+        4. Estimate interest rates
+        5. Save trained model
+        6. Perform geospatial risk analysis
+
+        Returns
+        -------
+        tuple
+            results : dict
+                Model evaluation metrics.
+
+            self.data : pd.DataFrame
+                Final enriched dataset including:
+                - PD predictions
+                - Expected loss
+                - Credit decisions
+                - Risk buckets
+                - Interest rates
+        '''
 
         training_output = self.train_and_evaluate()
 

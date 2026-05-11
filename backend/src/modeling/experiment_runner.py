@@ -3,14 +3,57 @@ import optuna
 from backend.src.pipeline import CreditPipeline
 from backend.src.modeling.config import OPTUNA_SEARCH_SPACE, MODEL_CONFIG
 
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
 
 class ExperimentRunner:
+    """
+    Benchmarking and experiment tracking framework for credit risk models.
+
+    This class automates:
+    - Hyperparameter optimization using Optuna
+    - Experiment tracking using MLflow
+    - Multi-model benchmarking
+    - Automatic best model selection
+    """
 
     def __init__(self, data, model_names=None):
+        """
+        Initialize the experiment runner.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            Input dataset used for training and evaluation.
+
+        model_names : list, optional
+            List of models to benchmark.
+        """
+
         self.data = data
-        self.model_names = model_names or ["logistic", "random_forest", "xgboost", "lightgbm"]
+
+        self.model_names = model_names or [
+            "logistic",
+            "random_forest",
+            "xgboost",
+            "lightgbm"
+        ]
 
     def _get_next_version(self, experiment_id):
+        """
+        Generate the next experiment version.
+
+        Parameters
+        ----------
+        experiment_id : str
+            MLflow experiment identifier.
+
+        Returns
+        -------
+        int
+            Next experiment version number.
+        """
+
         runs = mlflow.search_runs(experiment_ids=[experiment_id])
 
         if runs.empty:
@@ -19,8 +62,34 @@ class ExperimentRunner:
         return len(runs) + 1
 
     def optimize_model(self, model_name):
+        """
+        Optimize model hyperparameters using Optuna.
+
+        Parameters
+        ----------
+        model_name : str
+            Name of the model to optimize.
+
+        Returns
+        -------
+        dict
+            Best hyperparameters found.
+        """
 
         def objective(trial):
+            """
+            Optuna objective function.
+
+            Parameters
+            ----------
+            trial : optuna.trial.Trial
+                Optuna trial object.
+
+            Returns
+            -------
+            float
+                ROC-AUC score for the trial.
+            """
 
             params = {}
 
@@ -29,24 +98,23 @@ class ExperimentRunner:
             for param_name, config in search_space.items():
 
                 if config["type"] == "int":
-                    params[param_name] = trial.suggest_int(param_name, config["low"], config["high"])
+                    params[param_name] = trial.suggest_int(
+                        param_name, config["low"], config["high"])
 
                 elif config["type"] == "float":
-                    params[param_name] = trial.suggest_float(param_name, config["low"], config["high"])
+                    params[param_name] = trial.suggest_float(
+                        param_name, config["low"], config["high"])
 
             MODEL_CONFIG[model_name].update(params)
-            
+
             pipeline = CreditPipeline(
-                data=self.data.copy(),
-                model_name=model_name
-            )
+                data=self.data.copy(), model_name=model_name)
 
             output = pipeline.train_and_evaluate()
 
             results = output["results"]
 
             return results["test_roc_auc"]
-            
 
         study = optuna.create_study(direction="maximize")
 
@@ -55,6 +123,22 @@ class ExperimentRunner:
         return study.best_params
 
     def run(self):
+        """
+        Execute the benchmarking framework.
+
+        Workflow
+        --------
+        1. Optimize hyperparameters using Optuna
+        2. Train and evaluate models
+        3. Log experiments with MLflow
+        4. Compare models using ROC-AUC
+        5. Select the best-performing model
+
+        Returns
+        -------
+        str
+            Best-performing model name.
+        """
 
         mlflow.set_tracking_uri("file:./mlruns")
 
@@ -83,7 +167,8 @@ class ExperimentRunner:
                     "stage": "benchmarking"
                 })
 
-                pipeline = CreditPipeline(data=self.data.copy(), model_name=model_name)
+                pipeline = CreditPipeline(
+                    data=self.data.copy(), model_name=model_name)
 
                 results, _ = pipeline.run()
 
@@ -101,7 +186,8 @@ class ExperimentRunner:
 
                 mlflow.log_metric("test_recall", results["test_recall"])
 
-                mlflow.log_metric("optimal_threshold", results["optimal_threshold"])
+                mlflow.log_metric("optimal_threshold",
+                                  results["optimal_threshold"])
 
                 print(f"{model_name}: {score:.4f}")
 

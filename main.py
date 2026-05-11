@@ -1,61 +1,63 @@
 import pandas as pd
-from backend.src.modeling.experiment_runner import ExperimentRunner
 from backend.src.pipeline import CreditPipeline
 from backend.src.utils.prints import PrintUtils
 from backend.src.visualization.viz import Visualization
+from backend.src.modeling.experiment_runner import ExperimentRunner
 
 
 def main():
     """
-    Execute the end-to-end credit risk modeling pipeline.
+    Execute the complete credit risk modeling workflow.
 
     Workflow
     --------
-    1. Load dataset from local storage.
-    2. Initialize the credit pipeline with the selected model.
-    3. Run the pipeline (data preparation, training, prediction, evaluation).
-    4. Display key results.
-    5. Generate visualizations for model performance and risk metrics.
-    6. (Optional) Save processed results to disk.
+    1. Load the dataset
+    2. Run benchmarking and hyperparameter optimization
+    3. Select the best-performing model
+    4. Execute the final credit risk pipeline
+    5. Display evaluation results
+    6. Export dashboard visualization data
+    7. Save final processed dataset
 
     Notes
     -----
-    - The pipeline encapsulates the full modeling process, including:
-        * Data preprocessing
-        * Model training (e.g., Random Forest)
-        * Probability of Default (PD) estimation
-        * Risk metric computation
-    - Ensure that the dataset exists at the specified path before execution.
+    - Benchmarking is performed using MLflow and Optuna.
+    - Multiple machine learning models are compared automatically.
+    - The best model is selected using ROC-AUC performance.
+    - The final pipeline includes:
+        * Probability of Default estimation
+        * Expected Loss computation
+        * Business decision logic
+        * Risk segmentation
+        * Interest rate estimation
+        * Geospatial risk analysis
     """
 
-    # == Load data ==
+    # 1. Load dataset
     data = pd.read_csv("data/dataset_modelado_final.csv")
 
-    # == Initialize pipeline ==
-    # Options: 'logistic', 'random_forest', 'xgboost', 'lightgbm'
-    #pipeline = CreditPipeline(data=data, model_name="random_forest")
-        
-    # BENCHMARK + MLFLOW
+    # 2. Benchmark + MLflow + Optuna
     runner = ExperimentRunner(data=data)
 
     best_model = runner.run()
 
-    # Pipeline with best model
+    # 3. Final pipeline using best model
     pipeline = CreditPipeline(data=data, model_name=best_model)
 
-    # == Run pipeline ==
+    # 4. Run pipeline
     results, data_final = pipeline.run()
 
-    # == Print results (optional) ==
+    # 5. Print results
     printer = PrintUtils(data_final)
+
     printer.print_all(results)
 
-    # == Visualizations ==
+    # 6. Export dashboard data
     viz = Visualization()
-    # viz.plot_all(results, data_final)
+
     viz.export_dashboard_data(results, data_final)
 
-    # == Save results (optional) ==
+    # 7. Save final dataset
     data_final.to_csv("data/results.csv", index=False)
 
 

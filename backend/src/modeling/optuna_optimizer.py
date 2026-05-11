@@ -1,21 +1,46 @@
 import optuna
-import mlflow
-
 from backend.src.modeling.model import Model
 from backend.src.modeling.model_evaluation import ModelEvaluation
 
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
 
 class OptunaOptimizer:
+    """
+    Generic Optuna optimizer for machine learning models.
 
-    def __init__(
-        self,
-        model_name,
-        param_space,
-        X_train,
-        y_train,
-        X_test,
-        y_test
-    ):
+    This class automates:
+    - Hyperparameter sampling
+    - Model training
+    - Model evaluation
+    - MLflow logging
+    - Best parameter selection
+    """
+
+    def __init__(self, model_name, param_space, X_train, y_train, X_test, y_test):
+        """
+        Initialize the optimizer.
+
+        Parameters
+        ----------
+        model_name : str
+            Name of the machine learning model.
+
+        param_space : dict
+            Hyperparameter search space.
+
+        X_train : pd.DataFrame
+            Training features.
+
+        y_train : pd.Series
+            Training labels.
+
+        X_test : pd.DataFrame
+            Test features.
+
+        y_test : pd.Series
+            Test labels.
+        """
 
         self.model_name = model_name
         self.param_space = param_space
@@ -27,6 +52,19 @@ class OptunaOptimizer:
         self.y_test = y_test
 
     def _sample_params(self, trial):
+        """
+        Sample hyperparameters from the Optuna search space.
+
+        Parameters
+        ----------
+        trial : optuna.trial.Trial
+            Optuna trial object.
+
+        Returns
+        -------
+        dict
+            Sampled hyperparameters.
+        """
 
         params = {}
 
@@ -51,50 +89,67 @@ class OptunaOptimizer:
         return params
 
     def objective(self, trial):
+        """
+        Optuna objective function.
+
+        Parameters
+        ----------
+        trial : optuna.trial.Trial
+            Optuna trial object.
+
+        Returns
+        -------
+        float
+            ROC-AUC score for the current trial.
+        """
 
         params = self._sample_params(trial)
 
-        with mlflow.start_run(nested=True):
+        model = Model.get_model(
+            task_type="classification",
+            model_name=self.model_name,
+            y_train=self.y_train
+        )
 
-            model = Model.get_model(
-                task_type="classification",
-                model_name=self.model_name,
-                y_train=self.y_train
-            )
+        model.model.set_params(**params)
 
-            model.model.set_params(**params)
+        model.train(
+            self.X_train,
+            self.y_train
+        )
 
-            model.train(
-                self.X_train,
-                self.y_train
-            )
+        y_prob = model.predict_proba(
+            self.X_test
+        )
 
-            y_prob = model.predict_proba(self.X_test)
+        y_pred = (
+            y_prob >= 0.5
+        ).astype(int)
 
-            y_pred = (y_prob >= 0.5).astype(int)
+        evaluator = ModelEvaluation()
 
-            evaluator = ModelEvaluation()
+        results = evaluator.evaluate(
+            self.y_test,
+            y_pred,
+            y_prob
+        )
 
-            results = evaluator.evaluate(
-                self.y_test,
-                y_pred,
-                y_prob
-            )
-
-            mlflow.log_params(params)
-
-            for metric_name, metric_value in results.items():
-
-                if metric_name != "confusion_matrix":
-
-                    mlflow.log_metric(
-                        metric_name,
-                        metric_value
-                    )
-
-            return results["roc_auc"]
+        return results["roc_auc"]
 
     def optimize(self, n_trials=5):
+        """
+        Execute hyperparameter optimization.
+
+        Parameters
+        ----------
+        n_trials : int, optional
+            Number of Optuna trials.
+
+        Returns
+        -------
+        optuna.study.Study
+            Optuna study object containing optimization results.
+        """
 
         study = optuna.create_study(
             direction="maximize"

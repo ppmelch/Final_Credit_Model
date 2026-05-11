@@ -692,7 +692,7 @@ class Visualization:
         }
 
         output_path = (
-            FRONTEND_DIR / "dashboard_data.json"
+            FRONTEND_DIR / "data" /"dashboard_data.json"
         )
 
         with open(output_path, "w") as f:

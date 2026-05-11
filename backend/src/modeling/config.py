@@ -64,7 +64,49 @@ MODEL_CONFIG = {
 
 OPTUNA_SEARCH_SPACE = {
 
+    "logistic": {
+
+        "C": {
+            "type": "float",
+            "low": 0.001,
+            "high": 10
+        }
+    },
+
+    "random_forest": {
+
+        "n_estimators": {
+            "type": "int",
+            "low": 100,
+            "high": 500
+        },
+
+        "max_depth": {
+            "type": "int",
+            "low": 3,
+            "high": 15
+        },
+
+        "min_samples_split": {
+            "type": "int",
+            "low": 2,
+            "high": 50
+        },
+
+        "min_samples_leaf": {
+            "type": "int",
+            "low": 1,
+            "high": 20
+        }
+    },
+
     "xgboost": {
+
+        "n_estimators": {
+            "type": "int",
+            "low": 100,
+            "high": 500
+        },
 
         "max_depth": {
             "type": "int",
@@ -76,28 +118,96 @@ OPTUNA_SEARCH_SPACE = {
             "type": "float",
             "low": 0.01,
             "high": 0.2
-        }
-    },
+        },
 
-    "random_forest": {
+        "subsample": {
+            "type": "float",
+            "low": 0.6,
+            "high": 1.0
+        },
 
-        "n_estimators": {
+        "colsample_bytree": {
+            "type": "float",
+            "low": 0.6,
+            "high": 1.0
+        },
+
+        "min_child_weight": {
             "type": "int",
-            "low": 100,
-            "high": 1000
+            "low": 1,
+            "high": 15
+        },
+
+        "gamma": {
+            "type": "float",
+            "low": 0,
+            "high": 5
+        },
+
+        "reg_alpha": {
+            "type": "float",
+            "low": 0,
+            "high": 5
+        },
+
+        "reg_lambda": {
+            "type": "float",
+            "low": 0,
+            "high": 10
         }
     },
 
     "lightgbm": {
 
+        "n_estimators": {
+            "type": "int",
+            "low": 100,
+            "high": 500
+        },
+
+        "learning_rate": {
+            "type": "float",
+            "low": 0.01,
+            "high": 0.2
+        },
+
+        "max_depth": {
+            "type": "int",
+            "low": 3,
+            "high": 10
+        },
+
         "num_leaves": {
             "type": "int",
             "low": 20,
-            "high": 50
+            "high": 100
+        },
+
+        "subsample": {
+            "type": "float",
+            "low": 0.6,
+            "high": 1.0
+        },
+
+        "colsample_bytree": {
+            "type": "float",
+            "low": 0.6,
+            "high": 1.0
+        },
+
+        "reg_alpha": {
+            "type": "float",
+            "low": 0,
+            "high": 5
+        },
+
+        "reg_lambda": {
+            "type": "float",
+            "low": 0,
+            "high": 10
         }
     }
 }
-
 
 # Root directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
