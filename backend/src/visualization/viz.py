@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 from sklearn.calibration import calibration_curve
 from matplotlib.colors import LinearSegmentedColormap
+from backend.src.modeling.geospatial_risk import FRONTEND_DIR
 from sklearn.metrics import auc, roc_curve, confusion_matrix as sk_confusion_matrix
-
-from backend.src.modeling.geospatial_risk import BASE_DIR, FRONTEND_DIR
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -55,7 +54,7 @@ class Visualization:
         plt.grid(alpha=0.2)
         plt.show()
 
-    def plot_confusion_matrix(self, y_test, y_pred , name = ""):
+    def plot_confusion_matrix(self, y_test, y_pred, name=""):
         """
         Plot a confusion matrix with labeled cells.
 
@@ -255,7 +254,7 @@ class Visualization:
 
         plt.show()
 
-    def plot_probability_density(self , y_test , proba, model_name: str = "Modelo", class_names: tuple[str, str, str] = ("Denied","Approved")) -> None:
+    def plot_probability_density(self, y_test, proba, model_name: str = "Modelo", class_names: tuple[str, str, str] = ("Denied", "Approved")) -> None:
         """
         Plot kernel density estimation of predicted probabilities.
 
@@ -302,14 +301,13 @@ class Visualization:
         plt.grid(alpha=0.2)
         plt.tight_layout()
         plt.show()
-        
-        
+
     def plot_real_vs_predicted_pd(self,
-            predicted_pd: np.ndarray,
-            true_labels: pd.Series | np.ndarray,
-            predicted_labels: np.ndarray,
-            dataset_name: str = "Train"
-        ) -> None:
+                                  predicted_pd: np.ndarray,
+                                  true_labels: pd.Series | np.ndarray,
+                                  predicted_labels: np.ndarray,
+                                  dataset_name: str = "Train"
+                                  ) -> None:
         """
         Compare real and predicted PD distributions for Approved/Denied classes.
 
@@ -366,7 +364,7 @@ class Visualization:
 
             axes[class_id].set_title(
                 f"{label_names[class_id]}"
-                )
+            )
 
             axes[class_id].set_xlabel("Predicted PD")
             axes[class_id].set_ylabel("Density")
@@ -374,8 +372,6 @@ class Visualization:
 
         plt.tight_layout()
         plt.show()
-        
-        
 
     def plot_calibration_curve(
         self,
@@ -433,7 +429,7 @@ class Visualization:
 
         plt.tight_layout()
         plt.show()
-        
+
     def build_density_data(self, y_true, probabilities):
 
         y_true = np.array(y_true)
@@ -459,8 +455,6 @@ class Visualization:
                 denied_kde(x_range).tolist()
         }
 
-
-
     def plot_all(self, results, data):
         """
         Generate a full set of visualizations for model evaluation and analysis.
@@ -469,7 +463,7 @@ class Visualization:
         # ==========================================
         # 1. MODEL DISCRIMINATION PERFORMANCE
         # ==========================================
-        
+
         # ROC Curves
         self.plot_roc_curve(
             results['y_test'],
@@ -579,7 +573,11 @@ class Visualization:
             y='interest_rate_model'
         )
         '''
+
     def export_dashboard_data(self, results, data):
+        """
+        Export key visualization data to JSON for frontend dashboard.
+        """
 
         fpr_train, tpr_train, _ = roc_curve(
             results["y_train"],
@@ -612,7 +610,7 @@ class Visualization:
             .value_counts()
             .sort_index()
         )
-        
+
         interest_rate_bucket = (
             data.groupby("risk_bucket")["interest_rate_model"]
             .mean()
@@ -654,7 +652,7 @@ class Visualization:
                 "labels": data.loc[results["y_test"].index, "risk_bucket"].astype(str).tolist(),
                 "values": data.loc[results["y_test"].index, "predicted_pd"].tolist()
             },
-            
+
             "interest_rate_train": {
                 "labels":
                     data.loc[
@@ -681,8 +679,16 @@ class Visualization:
                         results["y_test"].index,
                         "interest_rate_model"
                     ].tolist()
-            }
+            },
 
+            "metrics": {
+
+                "train_auc":
+                    float(results["train_roc_auc"]),
+
+                "test_auc":
+                    float(results["test_roc_auc"]),
+            }
         }
 
         output_path = (

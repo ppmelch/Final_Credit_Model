@@ -5,7 +5,7 @@ let dashboardData = {};
    LOAD RISK DATA
 ========================= */
 
-fetch("risk_data.json")
+fetch("data/risk_data.json")
     .then(response => response.json())
     .then(data => {
 
@@ -49,7 +49,7 @@ const map = L.map('map', {
 
 function loadMap() {
 
-    fetch("Jalisco.json")
+    fetch("data/Jalisco.json")
         .then(response => response.json())
         .then(data => {
 
@@ -209,7 +209,7 @@ function loadMap() {
                 geojsonLayer.getBounds()
             );
 
-            map.zoomIn(0.3);
+            map.zoomIn(0.4);
 
             map.panBy([0, 10]);
 
@@ -225,7 +225,7 @@ function loadMap() {
 function getColor(risk) {
 
     if (risk == null)
-        return "#340000";
+        return "#ce6f02";
 
     if (risk >= 0.66) /* This is the threshold for very high risk */
         return "#4a0404";
@@ -264,11 +264,17 @@ window.addEventListener("scroll", () => {
 });
 
 
-fetch("dashboard_data.json")
+fetch("data/dashboard_data.json")
     .then(response => response.json())
     .then(data => {
 
         dashboardData = data;
+
+        document.getElementById("kpi-train-auc").textContent =
+            dashboardData.metrics.train_auc.toFixed(3);
+
+        document.getElementById("kpi-test-auc").textContent =
+            dashboardData.metrics.test_auc.toFixed(3);
 
         loadDashboard();
 
