@@ -1,6 +1,7 @@
 from backend.src.modeling.model import Model
 from backend.src.modeling.config import MODELS_DIR
 from backend.src.data.data_splitter import DataSplitter
+from backend.src.modeling.model_loader import ModelLoader
 from backend.src.data.data_preparation import DataPreparation
 from backend.src.modeling.business_logic import BusinessLogic
 from backend.src.modeling.geospatial_risk import GeospatialRisk
@@ -26,7 +27,7 @@ class CreditPipeline:
     - Model persistence
     '''
 
-    def __init__(self, data, model_name="random_forest"):
+    def __init__(self, data, model_name="random_forest", model_version=None):
         '''
         Initialize the credit risk pipeline.
 
@@ -38,10 +39,15 @@ class CreditPipeline:
         model_name : str, optional
             Machine learning model to use.
             Default is "random_forest".
+
+        model_version : str, optional
+            Saved model version to load from disk.
+            If provided, training is skipped.
         '''
 
         self.data = data
         self.model_name = model_name
+        self.model_version = model_version
 
     def train_and_evaluate(self):
         '''
@@ -65,32 +71,34 @@ class CreditPipeline:
             - X : processed feature matrix
         '''
 
-        # 1. Data preparation
         prep = DataPreparation(self.data)
+
         X, y = prep.prepare_data()
 
-        # 2. Train/Test split
         splitter = DataSplitter()
+
         X_train, X_test, y_train, y_test = splitter.split(X, y)
 
-        # 3. Model training
-        model = Model.get_model("classification", self.model_name, y_train=y_train)
+        model = Model.get_model(
+            "classification",
+            self.model_name,
+            y_train=y_train
+        )
+
         model.train(X_train, y_train)
 
-        # 4. Predictions
         y_train_proba = model.predict_proba(X_train)
+
         y_train_pred = (y_train_proba >= 0.5).astype(int)
 
         y_test_proba = model.predict_proba(X_test)
 
-        # 5. Threshold optimization
         optimizer = ThresholdOptimizer(y_test, y_test_proba)
 
         best_threshold = optimizer.optimize_threshold()
 
         y_test_pred = (y_test_proba >= best_threshold).astype(int)
 
-        # 6. Evaluation
         evaluator = ModelEvaluation()
 
         results = evaluator.evaluate_full(
@@ -116,12 +124,11 @@ class CreditPipeline:
 
         Workflow
         --------
-        1. Train and evaluate the model
+        1. Load a trained model version or train a new model
         2. Compute risk metrics
         3. Apply business decision logic
         4. Estimate interest rates
-        5. Save trained model
-        6. Perform geospatial risk analysis
+        5. Perform geospatial risk analysis
 
         Returns
         -------
@@ -136,15 +143,31 @@ class CreditPipeline:
                 - Credit decisions
                 - Risk buckets
                 - Interest rates
+
+            model : object
+                Trained machine learning model.
         '''
 
-        training_output = self.train_and_evaluate()
+        prep = DataPreparation(self.data)
 
-        results = training_output["results"]
-        model = training_output["model"]
-        X = training_output["X"]
+        X, y = prep.prepare_data()
 
-        # 7. Risk metrics
+        if self.model_version:
+
+            model, results = ModelLoader.load_model(
+                self.model_version
+            )
+
+        else:
+
+            training_output = self.train_and_evaluate()
+
+            results = training_output["results"]
+
+            model = training_output["model"]
+
+            X = training_output["X"]
+
         risk = RiskCalculator(lgd=0.45)
 
         pd_values = risk.calculate_pd(model, X)
@@ -152,11 +175,15 @@ class CreditPipeline:
         self.data["predicted_pd"] = pd_values
 
         ead = risk.calculate_ead(self.data)
+
         lgd = risk.calculate_lgd(self.data)
 
-        self.data["expected_loss"] = risk.calculate_expected_loss(pd_values, lgd, ead)
+        self.data["expected_loss"] = risk.calculate_expected_loss(
+            pd_values,
+            lgd,
+            ead
+        )
 
-        # 8. Business logic
         logic = BusinessLogic(
             threshold=results["optimal_threshold"],
             LGD=0.45,
@@ -173,13 +200,8 @@ class CreditPipeline:
 
         self.data["interest_rate_model"] = logic.calculate_interest_rate(pd_values)
 
-        # 9. Save model
-        model.save_model(f"{self.model_name}.pkl", MODELS_DIR)
-
-        # 10. Geospatial analysis
         geo = GeospatialRisk()
 
         geo.build_municipality_risk(self.data)
 
-        # 11. Return
-        return results, self.data
+        return results, self.data, model

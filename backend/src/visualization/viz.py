@@ -210,10 +210,8 @@ class Visualization:
         if x == "risk_bucket":
             bucket_labels = [
                 "Low Risk",
-                "Medium-Low Risk",
                 "Medium Risk",
                 "High Risk",
-                "Very High Risk"
             ]
 
             data[x] = data[x].astype(str)
@@ -540,19 +538,7 @@ class Visualization:
         # ==========================================
         # 3. RISK SEGMENTATION / FINANCIAL OUTPUTS
         # ==========================================
-        '''
-        # Risk Bucket Means
-        self.plot_bar(
-            data,
-            x='risk_bucket',
-            y='predicted_pd'
-        )
 
-        self.plot_bar(
-            data,
-            x='risk_bucket',
-            y='expected_loss'
-        )
 
         # Risk Bucket Distributions
         self.plot_boxplot(
@@ -572,7 +558,7 @@ class Visualization:
             x='risk_bucket',
             y='interest_rate_model'
         )
-        '''
+        
 
     def export_dashboard_data(self, results, data):
         """

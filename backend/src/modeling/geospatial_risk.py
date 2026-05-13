@@ -46,7 +46,7 @@ class GeospatialRisk:
             1 - municipality_risk["predicted_pd"]
         )
 
-        output_path = FRONTEND_DIR / "risk_data.json"
+        output_path = FRONTEND_DIR / "data" /"risk_data.json"
 
         municipality_risk.to_json(
             output_path,

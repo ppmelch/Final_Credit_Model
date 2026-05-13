@@ -123,11 +123,7 @@ class ClassificationModel(BaseModel):
         models_dir.mkdir(parents=True, exist_ok=True)
         path = models_dir / filename
 
-        joblib.dump({
-            "model": self.model,
-            "model_name": self.model_name,
-            "config": self.config
-        }, path)
+        joblib.dump(self, path)
 
     def load_model(self, filename: str, models_dir) -> None:
         """
