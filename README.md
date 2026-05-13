@@ -101,7 +101,7 @@ flowchart TB
     %% =========================
 
     BACKEND --> SCRIPTS[Scripts/]
-    SCRIPTS --> EXT[External Data Source Scripts (00-13).py]
+    SCRIPTS --> EXT[External Data Source Scripts]
 
     %% =========================
     %% FRONTEND
