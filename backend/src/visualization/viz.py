@@ -208,22 +208,15 @@ class Visualization:
         data = data.copy()
 
         if x == "risk_bucket":
-            bucket_labels = [
-                "Low Risk",
-                "Medium Risk",
-                "High Risk",
+
+            order = [
+                "Low",
+                "Medium",
+                "High"
             ]
 
-            data[x] = data[x].astype(str)
-
-            unique_buckets = sorted(data[x].unique())
-
-            mapping = dict(zip(unique_buckets, bucket_labels))
-
-            data[x] = data[x].map(mapping)
-
-            order = bucket_labels
-
+            # Remove possible NaNs
+            data = data.dropna(subset=[x])
         plt.figure(figsize=(10, 5))
 
         ax = sns.boxplot(
@@ -232,7 +225,8 @@ class Visualization:
             y=y,
             hue=hue,
             order=order,
-            palette=["#303030", "#868686"],
+            #palette=["#303030", "#868686"],
+            color="#4a4a4a",
             showfliers=False,
             linewidth=1.2
         )
@@ -300,23 +294,28 @@ class Visualization:
         plt.tight_layout()
         plt.show()
 
-    def plot_real_vs_predicted_pd(self,
-                                  predicted_pd: np.ndarray,
-                                  true_labels: pd.Series | np.ndarray,
-                                  predicted_labels: np.ndarray,
-                                  dataset_name: str = "Train"
-                                  ) -> None:
+    def plot_real_vs_predicted_pd(
+        self,
+        predicted_pd: np.ndarray,
+        true_labels: pd.Series | np.ndarray,
+        predicted_labels: np.ndarray,
+        dataset_name: str = "Train"
+    ) -> None:
         """
-        Compare real and predicted PD distributions for Approved/Denied classes.
+        Compare real and predicted PD distributions
+        for Approved/Denied classes.
 
         Parameters
         ----------
         predicted_pd : np.ndarray
             Predicted probability of default values.
+
         true_labels : array-like
             True borrower labels.
+
         predicted_labels : np.ndarray
             Predicted borrower labels.
+
         dataset_name : str
             Dataset identifier (Train/Test).
         """
@@ -361,16 +360,22 @@ class Visualization:
             )
 
             axes[class_id].set_title(
-                f"{label_names[class_id]}"
+                f"{label_names[class_id]} - {dataset_name}"
             )
 
             axes[class_id].set_xlabel("Predicted PD")
             axes[class_id].set_ylabel("Density")
             axes[class_id].legend()
 
-        plt.tight_layout()
-        plt.show()
+        plt.suptitle(
+            f"Real vs Predicted PD Distribution - {dataset_name}",
+            fontsize=14
+        )
 
+        plt.tight_layout()
+
+        plt.show()
+        
     def plot_calibration_curve(
         self,
         y_true,

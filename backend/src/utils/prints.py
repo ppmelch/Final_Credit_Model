@@ -1,3 +1,4 @@
+import mlflow
 import pandas as pd
 
 
@@ -104,6 +105,63 @@ class PrintUtils:
             self.data.groupby('risk_bucket')[
                 ['predicted_pd', 'interest_rate_model']].mean().reset_index()
         )
+        
+    @staticmethod
+    def print_mlflow_experiments() -> None:
+        """
+        Print all MLflow experiments, runs,
+        parameters, and evaluation metrics.
+        """
+
+        experiments = mlflow.search_experiments()
+
+        for exp in experiments:
+
+            print("\n" + "=" * 80)
+            print(f"EXPERIMENT: {exp.name}")
+            print("=" * 80)
+
+            runs = mlflow.search_runs(
+                experiment_ids=[exp.experiment_id]
+            )
+
+            if runs.empty:
+                print("No runs found.")
+                continue
+
+            for _, run in runs.iterrows():
+
+                print("\n" + "-" * 60)
+                print(f"RUN ID: {run['run_id']}")
+
+                if "tags.mlflow.runName" in run:
+                    print(f"MODEL NAME: {run['tags.mlflow.runName']}")
+
+                print("-" * 60)
+
+                # Parameters
+                print("\nPARAMETERS:\n")
+
+                for col in runs.columns:
+
+                    if col.startswith("params."):
+
+                        param_name = col.replace("params.", "")
+
+                        print(f"{param_name}: {run[col]}")
+
+                # Metrics
+                print("\nMETRICS:\n")
+
+                for col in runs.columns:
+
+                    if col.startswith("metrics."):
+
+                        metric_name = col.replace("metrics.", "")
+
+                        print(f"{metric_name}: {run[col]}")
+
+                print("\n" + "-" * 60)
 
     def print_all(self, results: dict) -> None:
         """

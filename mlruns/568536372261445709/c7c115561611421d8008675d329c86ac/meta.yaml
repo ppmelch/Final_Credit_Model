@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/ppmel/OneDrive/Escritorio/ITESO 8vo Semestre/FInal_Credit_Model/mlruns/568536372261445709/c7c115561611421d8008675d329c86ac/artifacts
+end_time: 1778699309688
+entry_point_name: ''
+experiment_id: '568536372261445709'
+lifecycle_stage: active
+run_id: c7c115561611421d8008675d329c86ac
+run_name: logistic_v2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1778699308877
+status: 3
+tags: []
+user_id: ppmel
