@@ -28,124 +28,123 @@
 ### Project Structure
  
 ```mermaid
-flowchart LR
+flowchart TB
 
     ROOT["Final_Credit_Model/"]
 
-    ROOT --> DATA["data/"]
-    ROOT --> BACKEND["backend/"]
-    ROOT --> FRONTEND["frontend/"]
-    ROOT --> NOTEBOOKS["notebooks/"]
-    ROOT --> DOCS["docs/"]
+    %% =========================
+    %% ROOT
+    %% =========================
 
-    %% ======================
-    %% BACKEND
-    %% ======================
+    ROOT --> DATA[data/]
+    ROOT --> BACKEND[backend/]
+    ROOT --> FRONTEND[frontend/]
+    ROOT --> NOTEBOOKS[notebooks/]
+    ROOT --> DOCS[docs/]
 
-    BACKEND --> SRC["src/"]
-    BACKEND --> SCRIPTS["Scripts/"]
+    ROOT --> MAIN[main.py]
+    ROOT --> REQ[requirements.txt]
+    ROOT --> README[README.md]
 
-    SRC --> SRC_DATA["data/"]
-    SRC --> MODELING["modeling/"]
-    SRC --> VIZMOD["visualization/"]
-    SRC --> UTILS["utils/"]
-    SRC --> MODELS["models/"]
-
+    %% =========================
     %% DATA
-    SRC_DATA --> PREP["data_preparation.py"]
-    SRC_DATA --> SPLIT["data_splitter.py"]
+    %% =========================
 
-    %% MODELING
-    MODELING --> BASE["base_model.py"]
-    MODELING --> BUSINESS["business_logic.py"]
-    MODELING --> CLASSIF["classification_model.py"]
-    MODELING --> CONFIG["config.py"]
-    MODELING --> EVAL["model_evaluation.py"]
-    MODELING --> MODEL["model.py"]
-    MODELING --> RISK["risk_calculator.py"]
-    MODELING --> GEO["geospatial_risk.py"]
-    MODELING --> THRESH["threshold_optimization.py"]
-    MODELING --> RUNNER["experiment_runner.py"]
-    MODELING --> OPTUNA["optuna_optimizer.py"]
-    MODELING --> LOADER["model_loader.py"]
+    DATA --> DATASET[dataset_modelado_final.csv]
+    DATA --> RESULTS[results.csv]
 
-    %% VISUALIZATION
-    VIZMOD --> VIZ["viz.py"]
+    %% =========================
+    %% BACKEND
+    %% =========================
 
-    %% UTILS
-    UTILS --> PRINTS["prints.py"]
-    UTILS --> UTILSFILE["utils.py"]
+    BACKEND --> SRC
 
-    %% MODELS
-    MODELS --> RF["random_forest.pkl"]
+    subgraph SRC[src/]
 
+        subgraph DATAR[data/]
+            dp[data_preparation.py]
+            ds[data_splitter.py]
+        end
+
+        subgraph MODELING[modeling/]
+            bm[base_model.py]
+            bl[business_logic.py]
+            cm[classification_model.py]
+            cfg[config.py]
+            me[model_evaluation.py]
+            mod[model.py]
+            rc[risk_calculator.py]
+            geo[geospatial_risk.py]
+            th[threshold_optimization.py]
+            er[experiment_runner.py]
+            opt[optuna_optimizer.py]
+            ml[model_loader.py]
+        end
+
+        subgraph VIS[visualization/]
+            vz[viz.py]
+        end
+
+        subgraph UT[utils/]
+            pr[prints.py]
+            ut[utils.py]
+        end
+
+        subgraph MODS[models/]
+            rf[random_forest.pkl]
+        end
+
+    end
+
+    %% =========================
     %% SCRIPTS
-    SCRIPTS --> EXTERNAL["External Data Source Scripts (00-13).py"]
+    %% =========================
 
-    %% ======================
+    BACKEND --> SCRIPTS[Scripts/]
+    SCRIPTS --> EXT[External Data Source Scripts (00-13).py]
+
+    %% =========================
     %% FRONTEND
-    %% ======================
+    %% =========================
 
-    FRONTEND --> INDEX["index.html"]
-    FRONTEND --> SVG["jalisco.svg"]
+    subgraph FRONTEND[frontend/]
 
-    FRONTEND --> FRONTDATA["data/"]
-    FRONTEND --> JS["js/"]
-    FRONTEND --> CSS["css/"]
+        idx[index.html]
+        svg[jalisco.svg]
 
-    FRONTDATA --> RISKJSON["risk_data.json"]
-    FRONTDATA --> JALISCOJSON["Jalisco.json"]
-    FRONTDATA --> DASHJSON["dashboard_data.json"]
+        subgraph FDATA[data/]
+            risk[risk_data.json]
+            jal[Jalisco.json]
+            dash[dashboard_data.json]
+        end
 
-    JS --> APP["app.js"]
-    CSS --> STYLE["style.css"]
+        subgraph JS[js/]
+            app[app.js]
+        end
 
-    %% ======================
+        subgraph CSS[css/]
+            style[style.css]
+        end
+
+    end
+
+    %% =========================
     %% NOTEBOOKS
-    %% ======================
+    %% =========================
 
-    NOTEBOOKS --> ANALYSIS["data_analysis.ipynb"]
-    NOTEBOOKS --> FEATURE["feature_analysis.ipynb"]
-    NOTEBOOKS --> DEV["Credit Model Development.ipynb"]
+    subgraph NOTEBOOKS[notebooks/]
+        da[data_analysis.ipynb]
+        fa[feature_analysis.ipynb]
+        dev[Credit Model Development.ipynb]
+    end
 
-    %% ======================
+    %% =========================
     %% DOCS
-    %% ======================
+    %% =========================
 
-    DOCS --> PDF["Final_Credit_Model.pdf"]
-
-    %% ======================
-    %% ROOT FILES
-    %% ======================
-
-    ROOT --> MAIN["main.py"]
-    ROOT --> REQ["requirements.txt"]
-    ROOT --> README["README.md"]
-
-    %% ======================
-    %% STYLES
-    %% ======================
-
-    classDef root fill:#111111,color:#ffffff,stroke:#ffffff,stroke-width:2px;
-    classDef folder fill:#4b4b4b,color:#ffffff,stroke:#cfcfcf;
-    classDef file fill:#6b6b6b,color:#ffffff,stroke:#d9d9d9;
-    classDef datafill fill:#2f6b2f,color:#ffffff,stroke:#9ad29a;
-    classDef frontendfill fill:#8c6d1f,color:#ffffff,stroke:#e3c36d;
-    classDef jsfill fill:#3b57b7,color:#ffffff,stroke:#9fb3ff;
-    classDef cssfill fill:#7a57c7,color:#ffffff,stroke:#c5b0ff;
-    classDef scriptsfill fill:#a54e4e,color:#ffffff,stroke:#ffb3b3;
-    classDef modelFill fill:#d8b0b0,color:#000000,stroke:#ffffff;
-
-    class ROOT root;
-
-    class DATA,BACKEND,FRONTEND,NOTEBOOKS,DOCS,SRC,SCRIPTS,SRC_DATA,MODELING,VIZMOD,UTILS,MODELS,FRONTDATA,JS,CSS folder;
-
-    class PREP,SPLIT,BASE,BUSINESS,CLASSIF,CONFIG,EVAL,MODEL,RISK,GEO,THRESH,RUNNER,OPTUNA,LOADER,VIZ,PRINTS,UTILSFILE,INDEX,SVG,APP,STYLE,ANALYSIS,FEATURE,DEV,PDF,MAIN,REQ,README,EXTERNAL file;
-
-    class RISKJSON,JALISCOJSON,DASHJSON frontendfill;
-    class APP jsfill;
-    class STYLE cssfill;
-    class RF modelFill;
+    subgraph DOCS[docs/]
+        pdf[Final_Credit_Model.pdf]
+    end
 ```
  
 ### Functional Architecture
