@@ -45,7 +45,6 @@ class ExperimentRunner:
         ]
 
     def _get_next_version(self, experiment_id, model_name):
-
         '''
         Generate the next experiment version.
 
@@ -161,7 +160,8 @@ class ExperimentRunner:
 
             MODEL_CONFIG[model_name].update(best_params)
 
-            version = self._get_next_version(experiment.experiment_id , model_name)
+            version = self._get_next_version(
+                experiment.experiment_id, model_name)
 
             run_name = f"{model_name}_v{version}"
 
@@ -188,9 +188,9 @@ class ExperimentRunner:
                 score = results["test_roc_auc"]
 
                 mlflow.log_param("model_name", model_name)
-                
+
                 model.save_model(f"{run_name}.pkl", MODELS_DIR)
-                
+
                 joblib.dump(results, f"{MODELS_DIR}/{run_name}_metrics.pkl")
 
                 mlflow.log_params(best_params)
@@ -203,8 +203,8 @@ class ExperimentRunner:
 
                 mlflow.log_metric("test_recall", results["test_recall"])
 
-                mlflow.log_metric("optimal_threshold", results["optimal_threshold"])
-                
+                mlflow.log_metric("optimal_threshold",
+                                  results["optimal_threshold"])
 
                 print(f"{model_name}: {score:.4f}")
 

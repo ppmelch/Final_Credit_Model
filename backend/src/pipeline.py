@@ -198,7 +198,8 @@ class CreditPipeline:
 
         self.data["risk_bucket"] = logic.risk_buckets(pd_values)
 
-        self.data["interest_rate_model"] = logic.calculate_interest_rate(pd_values)
+        self.data["interest_rate_model"] = logic.calculate_interest_rate(
+            pd_values)
 
         geo = GeospatialRisk()
 

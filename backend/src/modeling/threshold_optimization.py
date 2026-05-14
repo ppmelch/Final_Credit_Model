@@ -50,13 +50,8 @@ class ThresholdOptimizer:
 
             return score
 
-        study = optuna.create_study(
-            direction="maximize"
-        )
+        study = optuna.create_study(direction="maximize")
 
-        study.optimize(
-            objective,
-            n_trials=n_trials
-        )
+        study.optimize(objective, n_trials=n_trials)
 
         return study.best_params["threshold"]
